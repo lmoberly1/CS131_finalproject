@@ -9,7 +9,8 @@ class VideoManager():
 
     def __init__(self):
         self.DISTANCE_ESTIMATOR = DistanceEstimator()
-        self.HAND_ESTIMATOR = HandEstimator()
+        self.HAND_ESTIMATOR = HandEstimator()  # trombone
+        # self.NOTE_ESTIMATOR = NoteEstimator() # piano
         self.FRAME_OPS = FrameOperations()
 
         self.FIRST = True
@@ -34,9 +35,7 @@ class VideoManager():
                 self.WEB_CAM_H, self.WEB_CAM_W = frame.shape[0:2]
                 self.FIRST = False
 
-            # frame = self.DISTANCE_ESTIMATOR.get_distance(frame)
             frame = self.HAND_ESTIMATOR.detect(frame)
-            # frame = self.HAND_ESTIMATOR.draw(frame)
             cv.imshow('frame', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
