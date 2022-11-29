@@ -48,12 +48,14 @@ class SoundOperations():
         for i in range(len(noteslist)):
             mod = int(i/36)
             key = keylist[i-mod*36]+str(mod)
+            # USE SYNTH FREQUENCY
             sample = synth(freq)
             color = np.array(
                 [np.sin(i/25+1.7)*130+125, np.sin(i/30-0.21)*215+40, np.sin(i/25+3.7)*130+125])
             color = np.clip(color, 0, 255)
             notes[key] = [sample, noteslist[i], freq,
                           (posx, posy), 255*color/max(color)]
+            # PLAY SOUND HERE
             notes[key][0].set_volume(0.33)
             notes[key][0].play()
             notes[key][0].fadeout(100)
@@ -82,6 +84,7 @@ class SoundOperations():
                         mod = keymod.index(str(event.unicode))
                     elif key in keylist:
                         key = key+str(mod)
+                        print(notes[key])
                         notes[key][0].play()
                         keypresses.append(
                             [1, notes[key][1], pg.time.get_ticks()])

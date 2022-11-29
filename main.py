@@ -18,5 +18,5 @@ class Main():
 
 if __name__ == "__main__":
     app = Main()
-    app.music()
-    # app.live_estimation(0)
+    # app.music()
+    app.live_estimation(0)
