@@ -3,6 +3,7 @@ import cv2 as cv
 import pygame as pg
 import numpy as np
 import imutils
+from frame_ops import FrameOperations
 
 notes = [
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C"]
@@ -29,10 +30,25 @@ class Beatboard():
 
     def __init__(self):
         self.detector = HandDetector(detectionCon=0.8)
+        self.FRAME_OPS = FrameOperations()
         self.old_freq = 0
 
-    def detect_squares(self, img):
-        # https://learnopencv.com/edge-detection-using-opencv/
+    def extract_shape(self, cell):
+        """
+        Parameters:
+        -
+        Returns:
+        -
+        """
+        pass
+
+    def detect_grid(self, img):
+        """
+        Parameters:
+        - img: image containing grid
+        Returns:
+        - 2-tuple of grid in both RGB and grayscale
+        """
 
         # Grayscale and Gaussian Blur
         img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -55,13 +71,12 @@ class Beatboard():
 
         # Find Grid Outline
         gridOutline = None
-        # loop over the contours
+        # Loop over the contours
         for c in contours:
-            # approximate the contour
+            # Approximate the contour
             peri = cv.arcLength(c, True)
             approx = cv.approxPolyDP(c, 0.02 * peri, True)
-            # if our approximated contour has four points, then we can
-            # assume we have found the outline of the puzzle
+            # If contour has 4 points, assume we have found grid outline
             if len(approx) == 4:
                 gridOutline = approx
                 break
@@ -69,12 +84,13 @@ class Beatboard():
         if gridOutline is None:
             raise Exception(
                 ("Could not find grid outline. Debug thresholding and contour steps."))
-        output = img.copy()
-        cv.drawContours(output, [gridOutline], -1, (0, 255, 0), 2)
-        cv.imshow("Puzzle Outline", output)
-        cv.waitKey(0)
 
-        return output
+        grid = self.FRAME_OPS.four_point_transform(
+            img, gridOutline.reshape(4, 2))
+        gray_grid = self.FRAME_OPS.four_point_transform(
+            img_gray, gridOutline.reshape(4, 2))
+
+        return (grid, gray_grid)
 
 
 """
@@ -88,4 +104,10 @@ for c in contours:
 # cv.drawContours(img_copy, contours, -1, (0, 255, 0), 2)
 cv.imshow("Puzzle Outline", img_copy)
 cv.waitKey(0)
+
+Grid out
+        # output = img.copy()
+        # cv.drawContours(output, [gridOutline], -1, (0, 255, 0), 2)
+        # cv.imshow("Puzzle Outline", output)
+        # cv.waitKey(0)
 """

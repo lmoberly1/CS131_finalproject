@@ -7,18 +7,12 @@ import numpy as np
 class FrameOperations():
 
     def __init__(self):
-        self.CWD = os.getcwd()
-        self.RES_F = os.path.join(self.CWD, 'resources')
-        self.FILTER_F = os.path.join(self.RES_F, 'FILTERS')
-        self.SPEED_FILTER = cv.imread(os.path.join(self.FILTER_F, "SPEED.png"))
-        self.CONT_FILTER = cv.imread(
-            os.path.join(self.FILTER_F, "CONTINUE.png"))
+        pass
 
-    def order_points(pts):
+    def order_points(self, pts):
         # Initialize a list of coordinates that will be ordered as followed:
         # top-left, top-right, bottom-right, bottom-left
         rect = np.zeros((4, 2), dtype="float32")
-
         # Top-left point will have smallest sum, bottom-right will have largest sum
         s = pts.sum(axis=1)
         rect[0] = pts[np.argmin(s)]
@@ -30,9 +24,9 @@ class FrameOperations():
         rect[3] = pts[np.argmax(diff)]
         return rect
 
-    def four_point_transform(image, pts):
+    def four_point_transform(self, image, pts):
         # Obtain a consistent order of the points and unpack them individually
-        rect = order_points(pts)
+        rect = self.order_points(pts)
         (tl, tr, br, bl) = rect
         # Compute the width of the new image: max distance btw b-right and b-left or the t-right and t-left x-coords
         widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
@@ -50,8 +44,8 @@ class FrameOperations():
             [maxWidth - 1, maxHeight - 1],
             [0, maxHeight - 1]], dtype="float32")
         # Compute the perspective transform matrix and apply it
-        M = cv2.getPerspectiveTransform(rect, dst)
-        warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+        M = cv.getPerspectiveTransform(rect, dst)
+        warped = cv.warpPerspective(image, M, (maxWidth, maxHeight))
         return warped
 
     def average_blur(self, frame, kernel_size):
@@ -65,13 +59,10 @@ class FrameOperations():
     def convert_scale_abs(self, frame, alpha, beta):
         """alpha must be float, beta must be int!"""
         # alpha for contrast control, beta for brightness control
-
         conversion = cv.convertScaleAbs(frame, alpha=alpha, beta=beta)
-
         return conversion
 
     def contrast_brightness(self, frame, brightness, contrast):
-
         conversion = np.int16(frame)
         conversion = conversion * (contrast/127+1) - contrast + brightness
         conversion = np.clip(conversion, 0, 255)
