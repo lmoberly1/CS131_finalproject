@@ -50,7 +50,7 @@ def get_freq(dist):
     return freq, note_text
 
 
-class HandEstimator():
+class Trombone():
 
     def __init__(self):
         self.detector = HandDetector(detectionCon=0.8)

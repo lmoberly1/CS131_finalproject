@@ -1,7 +1,8 @@
 import cv2 as cv
 from frame_ops import FrameOperations
 from distance_between import DistanceEstimator
-from hand_estimator import HandEstimator
+from trombone import Trombone
+from beatboard import Beatboard
 import pygame as pg
 
 
@@ -9,8 +10,8 @@ class VideoManager():
 
     def __init__(self):
         self.DISTANCE_ESTIMATOR = DistanceEstimator()
-        self.HAND_ESTIMATOR = HandEstimator()  # trombone
-        # self.NOTE_ESTIMATOR = NoteEstimator() # piano
+        self.TROMBONE = Trombone()  # trombone
+        self.BEATBOARD = Beatboard()  # piano
         self.FRAME_OPS = FrameOperations()
 
         self.FIRST = True
@@ -26,6 +27,10 @@ class VideoManager():
         pg.init()
         pg.mixer.init()
 
+        # img = cv.imread('test.jpeg')
+        # frame = self.BEATBOARD.detect_squares(img)
+        # cv.imwrite('hough.jpg', frame)
+
         while(True):
             has_frame, frame = cap.read()
             # frame = cv.flip(frame, 1)
@@ -35,7 +40,8 @@ class VideoManager():
                 self.WEB_CAM_H, self.WEB_CAM_W = frame.shape[0:2]
                 self.FIRST = False
 
-            frame = self.HAND_ESTIMATOR.detect(frame)
+            # frame = self.TROMBONE.detect(frame)
+            frame = self.BEATBOARD.detect_squares(frame)
             cv.imshow('frame', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
