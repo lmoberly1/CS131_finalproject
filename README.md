@@ -1,14 +1,11 @@
-## Piano
+## Beatboard
 
-Access mobile camera on phone
-Detect sticky notes on table
-Assign musical note to sticky notes
-
-- can have multiple octaves by toggling with two keys above keyboard
-  When sticky note is covered, play sound
+Uses Canny Edge detection to locate a grid of squares and shapes on the grid.
+Each grid square corresponds to a musical intonation (vertical) and a beat in a standard 4-beat measure (horizontal).
+Three shapes can be placed in a grid square and will produce a musical note from their corresponding instrument.
 
 ## Trombone
 
-Use webcam and detect hands
-If one hand is closed, play a corresponding note based on distance between hands
-If neither hand is closed, stop the sound
+Uses hand detection to calculate distance between hands.
+Similar to a trombone, will play notes depending on this distance.
+Keep hands open to play, close into a fist to cut off sound.

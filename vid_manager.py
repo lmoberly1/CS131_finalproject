@@ -13,23 +13,22 @@ class VideoManager():
         self.TROMBONE = Trombone()  # trombone
         self.BEATBOARD = Beatboard()  # piano
         self.FRAME_OPS = FrameOperations()
-
         self.FIRST = True
 
+    def estimate_img(self):
+
+        img = cv.imread('grid.jpeg')
+        frame = self.BEATBOARD.detect_squares(img)
+        cv.imwrite('grid_lines.jpg', frame)
+
     def estimate_vid(self, webcam_id=0):
-        """
-        Reads webcam, applies distance estimation on webcam
-        """
+
         cap = cv.VideoCapture(webcam_id)
         cap.set(3, 1920)
         cap.set(4, 1080)
 
         pg.init()
         pg.mixer.init()
-
-        # img = cv.imread('test.jpeg')
-        # frame = self.BEATBOARD.detect_squares(img)
-        # cv.imwrite('hough.jpg', frame)
 
         while(True):
             has_frame, frame = cap.read()

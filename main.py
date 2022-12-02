@@ -12,6 +12,9 @@ class Main():
     def live_estimation(self, webcam_id=0):
         self.VI_M.estimate_vid(webcam_id)
 
+    def img_estimation(self):
+        self.VI_M.estimate_img()
+
     def music(self):
         self.SOUND.play_sound()
 
@@ -19,4 +22,5 @@ class Main():
 if __name__ == "__main__":
     app = Main()
     # app.music()
-    app.live_estimation(0)
+    # app.live_estimation(0)
+    app.img_estimation()

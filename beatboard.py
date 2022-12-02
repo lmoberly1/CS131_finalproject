@@ -39,7 +39,53 @@ class Beatboard():
         img_blur = cv.GaussianBlur(img_gray, (3, 3), 0)
 
         # Canny Edge Detection
-        edges = cv.Canny(image=img_blur, threshold1=100,
-                         threshold2=200)
+        # edges = cv.Canny(image=img_blur, threshold1=100,
+        #                  threshold2=200)
 
-        return edges
+        # Adaptive Thresholding
+        thresh = cv.adaptiveThreshold(img_blur, 255,
+                                      cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
+        thresh = cv.bitwise_not(thresh)
+
+        # Contour Detection
+        contours, _ = cv.findContours(
+            thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+        contours = sorted(contours, key=cv.contourArea, reverse=True)
+
+        # Find Grid Outline
+        gridOutline = None
+        # loop over the contours
+        for c in contours:
+            # approximate the contour
+            peri = cv.arcLength(c, True)
+            approx = cv.approxPolyDP(c, 0.02 * peri, True)
+            # if our approximated contour has four points, then we can
+            # assume we have found the outline of the puzzle
+            if len(approx) == 4:
+                gridOutline = approx
+                break
+
+        if gridOutline is None:
+            raise Exception(
+                ("Could not find grid outline. Debug thresholding and contour steps."))
+        output = img.copy()
+        cv.drawContours(output, [gridOutline], -1, (0, 255, 0), 2)
+        cv.imshow("Puzzle Outline", output)
+        cv.waitKey(0)
+
+        return output
+
+
+"""
+img_copy = img.copy()
+for c in contours:
+    x, y, w, h = cv.boundingRect(c)
+    cv.putText(img_copy, str(w), (x, y - 10),
+                cv.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
+    cv.rectangle(img_copy, (x, y), (x + w, y + h), (36, 255, 12), 1)
+
+# cv.drawContours(img_copy, contours, -1, (0, 255, 0), 2)
+cv.imshow("Puzzle Outline", img_copy)
+cv.waitKey(0)
+"""
