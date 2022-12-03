@@ -15,10 +15,14 @@ class VideoManager():
 
     def estimate_img(self):
 
-        img = cv.imread('grid_shape.png')
+        img = cv.imread('images/trial2.jpg')
         grid_rgb, grid_gray = self.BEATBOARD.detect_grid(img)
         board = self.BEATBOARD.set_board(grid_gray)
-        # cv.imwrite('grid__shape_lines.jpg', grid_gray)
+
+        pg.init()
+        pg.mixer.init()
+
+        self.BEATBOARD.play_board(board.T, 120)
 
     def estimate_vid(self, webcam_id=0):
 

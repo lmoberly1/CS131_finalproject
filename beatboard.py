@@ -4,33 +4,15 @@ import pygame as pg
 import numpy as np
 import imutils
 from frame_ops import FrameOperations
-
-notes = [
-    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C"]
-
-
-def synth(frequency=261, duration=1.5, sampling_rate=44100):
-    frames = int(duration*sampling_rate)
-    arr = np.cos(2*np.pi*frequency*np.linspace(0, duration, frames))
-    arr = arr + np.cos(4*np.pi*frequency *
-                       np.linspace(0, duration, frames))
-    arr = arr - np.cos(6*np.pi*frequency *
-                       np.linspace(0, duration, frames))
-    # arr = np.clip(arr*10, -1, 1) # squarish waves
-    # arr = np.cumsum(np.clip(arr*10, -1, 1)) # triangularish waves pt1
-    # arr = arr+np.sin(2*np.pi*frequency*np.linspace(0,duration, frames)) # triangularish waves pt1
-    arr = arr/max(np.abs(arr))  # triangularish waves pt1
-    sound = np.asarray([32767*arr, 32767*arr]).T.astype(np.int16)
-    sound = pg.sndarray.make_sound(sound.copy())
-
-    return sound
+from sound_ops import SoundOperations
+from time import sleep
 
 
 class Beatboard():
 
     def __init__(self):
-        # self.detector = HandDetector(detectionCon=0.8)
         self.FRAME_OPS = FrameOperations()
+        self.SOUND_OPS = SoundOperations()
         self.old_freq = 0
 
     def extract_shape(self, cell):
@@ -148,10 +130,34 @@ class Beatboard():
                 shape = self.extract_shape(cell)
                 # verify that the cell is not empty
                 if shape is not None:
-                    board[y, x] = 1
+                    board[y, x] = shape
                     num_shapes += 1
         # Return board
         return board
+
+    def play_board(self, board, bpm):
+        """
+        Parameters:
+        - board: 2d array, each row is one beat
+        """
+        try:
+            index = 0
+            while True:
+                instruments = board[index]
+                print(np.count_nonzero(instruments))
+                # If instrument, then play sound
+                if np.count_nonzero(instruments) > 0:
+                    sound = self.SOUND_OPS.get_sound(duration=60/bpm)
+                    print('Playing sound')
+                    sound.play()
+                # Delay
+                sleep(60 / bpm)
+                # Return to start of beatboard
+                index += 1
+                if index > 7:
+                    index = 0
+        except KeyboardInterrupt:
+            print('End Program.')
 
 
 """
