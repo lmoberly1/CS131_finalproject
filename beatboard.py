@@ -1,4 +1,4 @@
-from cvzone.HandTrackingModule import HandDetector
+from skimage.segmentation import clear_border
 import cv2 as cv
 import pygame as pg
 import numpy as np
@@ -29,18 +29,48 @@ def synth(frequency=261, duration=1.5, sampling_rate=44100):
 class Beatboard():
 
     def __init__(self):
-        self.detector = HandDetector(detectionCon=0.8)
+        # self.detector = HandDetector(detectionCon=0.8)
         self.FRAME_OPS = FrameOperations()
         self.old_freq = 0
 
     def extract_shape(self, cell):
         """
         Parameters:
+        - cell: image of individual cell (possibly with shape)
         -
         Returns:
-        -
+        - num_edges: number of edges if shape, else None
         """
-        pass
+        # Thresholding and clearing any connected borders
+        thresh = cv.threshold(cell, 0, 255,
+                              cv.THRESH_BINARY_INV | cv.THRESH_OTSU)[1]
+        thresh = clear_border(thresh)
+
+        # Find contours in the thresholded cell
+        cnts = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL,
+                               cv.CHAIN_APPROX_SIMPLE)
+        cnts = imutils.grab_contours(cnts)
+        # if no contours were found than this is an empty cell
+        if len(cnts) == 0:
+            return None
+        else:
+            i = 0
+            for contour in cnts:
+                # Approximate the shape
+                approx = cv.approxPolyDP(
+                    contour, 0.01 * cv.arcLength(contour, True), True)
+
+                # Putting shape name at center of each shape
+                if len(approx) == 3:
+                    return 3
+                elif len(approx) == 4:
+                    return 4
+                elif len(approx) == 5:
+                    return 5
+                elif len(approx) == 6:
+                    return 6
+                else:
+                    return 1
 
     def detect_grid(self, img):
         """
@@ -91,6 +121,37 @@ class Beatboard():
             img_gray, gridOutline.reshape(4, 2))
 
         return (grid, gray_grid)
+
+    def set_board(self, image):
+
+        # Initialize music grid
+        board = np.zeros((8, 8), dtype="int")
+        stepX = image.shape[1] // 8
+        stepY = image.shape[0] // 8
+
+        # Loop over the grid locations
+        num_shapes = 0
+        for y in range(0, 8):
+            # Initialize the current list of cell locations
+            row = []
+            for x in range(0, 8):
+                # Compute the starting and ending (x, y)-coordinates of the current cell
+                startX = x * stepX
+                startY = y * stepY
+                endX = (x + 1) * stepX
+                endY = (y + 1) * stepY
+                # Add the (x, y)-coordinates to our cell locations list
+                row.append((startX, startY, endX, endY))
+
+                # Crop the cell from the warped transform image and then check for shape in the cell
+                cell = image[startY:endY, startX:endX]
+                shape = self.extract_shape(cell)
+                # verify that the cell is not empty
+                if shape is not None:
+                    board[y, x] = 1
+                    num_shapes += 1
+        # Return board
+        return board
 
 
 """
