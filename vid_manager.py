@@ -15,9 +15,11 @@ class VideoManager():
 
     def estimate_img(self):
 
-        img = cv.imread('images/trial2.jpg')
+        img = cv.imread('images/trial3.jpg')
         grid_rgb, grid_gray = self.BEATBOARD.detect_grid(img)
+        # cv.imwrite('images/trial3_board.jpg', grid_gray)
         board = self.BEATBOARD.set_board(grid_gray)
+        # print(board)
 
         pg.init()
         pg.mixer.init()

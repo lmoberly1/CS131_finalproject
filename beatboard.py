@@ -13,7 +13,7 @@ class Beatboard():
     def __init__(self):
         self.FRAME_OPS = FrameOperations()
         self.SOUND_OPS = SoundOperations()
-        self.old_freq = 0
+        self.frequencies = [523, 494, 440, 392, 349, 330, 294, 263]  # C5 to C4
 
     def extract_shape(self, cell):
         """
@@ -144,12 +144,15 @@ class Beatboard():
             index = 0
             while True:
                 instruments = board[index]
-                print(np.count_nonzero(instruments))
                 # If instrument, then play sound
                 if np.count_nonzero(instruments) > 0:
-                    sound = self.SOUND_OPS.get_sound(duration=60/bpm)
-                    print('Playing sound')
-                    sound.play()
+                    for i, beat in enumerate(instruments):
+                        if beat:
+                            sound = self.SOUND_OPS.get_sound(
+                                frequency=self.frequencies[i], duration=60/bpm)
+                            pg.mixer.Channel(i).play(sound)
+                            print('Playing sound')
+                    # sound.play()
                 # Delay
                 sleep(60 / bpm)
                 # Return to start of beatboard
