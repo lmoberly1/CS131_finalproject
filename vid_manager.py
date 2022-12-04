@@ -24,7 +24,6 @@ class VideoManager():
     def get_board(self):
         # grid_rgb, grid_gray = self.BEATBOARD.detect_grid(
         #     frame)
-        print('getting board')
         img = cv.imread('images/trial3.jpg')
         grid_rgb, grid_gray = self.BEATBOARD.detect_grid(
             img)
@@ -40,8 +39,8 @@ class VideoManager():
             frame_count = 0
             fps = 30
             save_interval = (60 / bpm) * 8
-            print('fps: ', fps)
-            print('save: ', save_interval)
+            print('FPS: ', fps)
+            print('Time of 1 Measure (s): ', save_interval)
             while(True):
                 has_frame, frame = cap.read()
 
@@ -49,10 +48,9 @@ class VideoManager():
                 if program == "trombone":
                     frame = self.TROMBONE.detect(frame)
                 else:
-                    print('NEW LOOP BITCHES')
                     try:
                         if self.board is None:
-                            print("getting initial board")
+                            print("Getting initial board.")
                             self.get_board()
                         self.BEATBOARD.play_board(
                             (self.board).T, self.get_board, bpm)
@@ -61,7 +59,7 @@ class VideoManager():
                         continue
 
                 # Show video
-                cv.imshow('Video Output', frame)
+                # cv.imshow('Video Output', frame)
 
                 if cv.waitKey(1) & 0xFF == ord('q'):
                     break

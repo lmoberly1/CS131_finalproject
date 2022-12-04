@@ -45,6 +45,5 @@ class SoundOperations():
         """
         for instrument_index, other_index in enumerate(beats):
             if other_index:  # there is a sound
-                print('Playing note: ', instrument_index)
                 instrument = self.instrument_numbers[instrument_index]
                 instrument.play()

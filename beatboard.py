@@ -6,6 +6,7 @@ import imutils
 from frame_ops import FrameOperations
 from sound_ops import SoundOperations
 from time import sleep
+import threading
 
 
 class Beatboard():
@@ -145,8 +146,9 @@ class Beatboard():
         sound_length = 60 / bpm
         for j in range(8):
             if j == 4:  # get new board
-                print('calling callback')
-                callback_function()
+                callback_thread = threading.Thread(
+                    target=callback_function, name="Downloader")
+                callback_thread.start()
             instruments = board[j]
 
             # If instrument, then play sound
@@ -154,5 +156,4 @@ class Beatboard():
                 # Instruments has different values based on shape/instrument
                 self.SOUND_OPS.play_sounds(
                     instruments, sound_length)
-            print('sleeping')
             sleep(sound_length)
