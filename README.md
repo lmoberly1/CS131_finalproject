@@ -13,3 +13,4 @@ Keep hands open to play, close into a fist to cut off sound.
 ## Resources
 
 https://learnopencv.com/edge-detection-using-opencv/
+https://pjb.com.au/muscript/gm.html

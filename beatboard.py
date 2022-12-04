@@ -135,30 +135,28 @@ class Beatboard():
         # Return board
         return board
 
-    def play_board(self, board, bpm):
+    def play_board(self, board, player, bpm=60, volume=127):
         """
         Parameters:
         - board: 2d array, each row is one beat
         """
+        sound_length = 60 / bpm
         try:
             index = 0
             while True:
                 instruments = board[index]
+
                 # If instrument, then play sound
                 if np.count_nonzero(instruments) > 0:
-                    for i, beat in enumerate(instruments):
-                        if beat:
-                            sound = self.SOUND_OPS.get_sound(
-                                frequency=self.frequencies[i], duration=60/bpm)
-                            pg.mixer.Channel(i).play(sound)
-                            print('Playing sound')
-                    # sound.play()
-                # Delay
-                sleep(60 / bpm)
+                    # Instruments has different values based on shape/instrument
+                    self.SOUND_OPS.play_midi(
+                        player, instruments, sound_length, volume)
+
                 # Return to start of beatboard
                 index += 1
                 if index > 7:
                     index = 0
+
         except KeyboardInterrupt:
             print('End Program.')
 
@@ -180,4 +178,25 @@ Grid out
         # cv.drawContours(output, [gridOutline], -1, (0, 255, 0), 2)
         # cv.imshow("Puzzle Outline", output)
         # cv.waitKey(0)
+
+# sound = self.SOUND_OPS.get_sound(
+#     frequency=self.frequencies[i], duration=60/bpm)
+# pg.mixer.Channel(i).play(sound)
+# print('Playing sound')
+
+
+print(port)
+print(pg.midi.get_count())
+for i in range(pg.midi.get_count()):
+    r = pg.midi.get_device_info(i)
+    (interf, name, input, output, opened) = r
+
+    in_out = ""
+    if input:
+        in_out = "(input)"
+    if output:
+        in_out = "(output)"
+
+    print("%2i: interface :%s:, name :%s:, opened :%s:  %s" %
+          (i, interf, name, opened, in_out))
 """
