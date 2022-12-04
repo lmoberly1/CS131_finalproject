@@ -2,9 +2,6 @@ import os
 import cv2 as cv
 import numpy as np
 import pygame as pg
-from time import sleep
-
-# Contains sound operations
 
 
 class SoundOperations():
@@ -43,12 +40,11 @@ class SoundOperations():
         - player: pygame midi output
         - instruments: 1D int array; int corresponds to instrument type (1, 3, 4, 5, or 6)
         - length: duration sound will be played
-        - volume: volume of sound (max is 127)
+        Function:
+        - plays all notes on one beat
         """
         for instrument_index, other_index in enumerate(beats):
             if other_index:  # there is a sound
                 print('Playing note: ', instrument_index)
                 instrument = self.instrument_numbers[instrument_index]
                 instrument.play()
-
-        sleep(length)

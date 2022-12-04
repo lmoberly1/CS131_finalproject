@@ -135,68 +135,24 @@ class Beatboard():
         # Return board
         return board
 
-    def play_board(self, board, bpm=60):
+    def play_board(self, board, callback_function, bpm=60):
         """
         Parameters:
         - board: 2d array, each row is one beat
+        Function:
+        - loops through all 8 measures and plays sounds
         """
         sound_length = 60 / bpm
-        try:
-            index = 0
-            while True:
-                instruments = board[index]
+        for j in range(8):
+            if j == 4:  # get new board
+                print('calling callback')
+                callback_function()
+            instruments = board[j]
 
-                # If instrument, then play sound
-                if np.count_nonzero(instruments) > 0:
-                    # Instruments has different values based on shape/instrument
-                    self.SOUND_OPS.play_sounds(
-                        instruments, sound_length)
-
-                # Return to start of beatboard
-                index += 1
-                if index > 7:
-                    index = 0
-
-        except KeyboardInterrupt:
-            print('End Program.')
-
-
-"""
-img_copy = img.copy()
-for c in contours:
-    x, y, w, h = cv.boundingRect(c)
-    cv.putText(img_copy, str(w), (x, y - 10),
-                cv.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
-    cv.rectangle(img_copy, (x, y), (x + w, y + h), (36, 255, 12), 1)
-
-# cv.drawContours(img_copy, contours, -1, (0, 255, 0), 2)
-cv.imshow("Puzzle Outline", img_copy)
-cv.waitKey(0)
-
-Grid out
-        # output = img.copy()
-        # cv.drawContours(output, [gridOutline], -1, (0, 255, 0), 2)
-        # cv.imshow("Puzzle Outline", output)
-        # cv.waitKey(0)
-
-# sound = self.SOUND_OPS.get_sound(
-#     frequency=self.frequencies[i], duration=60/bpm)
-# pg.mixer.Channel(i).play(sound)
-# print('Playing sound')
-
-
-print(port)
-print(pg.midi.get_count())
-for i in range(pg.midi.get_count()):
-    r = pg.midi.get_device_info(i)
-    (interf, name, input, output, opened) = r
-
-    in_out = ""
-    if input:
-        in_out = "(input)"
-    if output:
-        in_out = "(output)"
-
-    print("%2i: interface :%s:, name :%s:, opened :%s:  %s" %
-          (i, interf, name, opened, in_out))
-"""
+            # If instrument, then play sound
+            if np.count_nonzero(instruments) > 0:
+                # Instruments has different values based on shape/instrument
+                self.SOUND_OPS.play_sounds(
+                    instruments, sound_length)
+            print('sleeping')
+            sleep(sound_length)
