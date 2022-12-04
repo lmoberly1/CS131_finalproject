@@ -135,7 +135,7 @@ class Beatboard():
         # Return board
         return board
 
-    def play_board(self, board, player, bpm=60, volume=127):
+    def play_board(self, board, bpm=60):
         """
         Parameters:
         - board: 2d array, each row is one beat
@@ -149,8 +149,8 @@ class Beatboard():
                 # If instrument, then play sound
                 if np.count_nonzero(instruments) > 0:
                     # Instruments has different values based on shape/instrument
-                    self.SOUND_OPS.play_midi(
-                        player, instruments, sound_length, volume)
+                    self.SOUND_OPS.play_sounds(
+                        instruments, sound_length)
 
                 # Return to start of beatboard
                 index += 1

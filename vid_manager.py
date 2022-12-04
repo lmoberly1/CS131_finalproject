@@ -2,9 +2,6 @@ import cv2 as cv
 from frame_ops import FrameOperations
 from trombone import Trombone
 from beatboard import Beatboard
-import pygame as pg
-import pygame.midi
-import fluidsynth
 
 
 class VideoManager():
@@ -23,25 +20,13 @@ class VideoManager():
         board = self.BEATBOARD.set_board(grid_gray)
         # print(board)
 
-        pg.init()
-        pg.mixer.init()
-        # pg.midi.init()
-        # port = pg.midi.get_default_output_id()
-        # player = pg.midi.Output(port, 0)
-
-        player = fluidsynth.Synth()
-        player.start()
-
-        self.BEATBOARD.play_board(board.T, player, 120)
+        self.BEATBOARD.play_board(board.T, 120)
 
     def estimate_vid(self, webcam_id=0):
 
         cap = cv.VideoCapture(webcam_id)
         cap.set(3, 1920)
         cap.set(4, 1080)
-
-        pg.init()
-        pg.mixer.init()
 
         while(True):
             has_frame, frame = cap.read()

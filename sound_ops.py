@@ -15,15 +15,29 @@ class SoundOperations():
             "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C"]
         self.midi_numbers = [72, 71, 69, 67, 65,
                              64, 62, 60]  # C5 to C4 in MIDI numbers
+
+        pg.init()
+        pg.mixer.init()
+
+        self.hi_hat = pg.mixer.Sound('sounds/hi_hat.wav')
+        self.snare = pg.mixer.Sound('sounds/snare.wav')
+        self.kick = pg.mixer.Sound('sounds/kick.wav')
+        self.crash = pg.mixer.Sound('sounds/crash.wav')
+        self.clap = pg.mixer.Sound('sounds/clap.wav')
+        self.tom = pg.mixer.Sound("sounds/tom.wav")
+
         self.instrument_numbers = {
-            1: 38,  # circle = bass
-            3: 115,  # triangle = woodblock
-            4: 47,  # square = timpani
-            5: 0,
-            6: 0,
+            0: self.hi_hat,
+            1: self.hi_hat,
+            2: self.hi_hat,
+            3: self.snare,
+            4: self.kick,
+            5: self.crash,
+            6: self.clap,
+            7: self.tom
         }
 
-    def play_midi(self, player, beats, length, volume):
+    def play_sounds(self, beats, length):
         """
         Parameters:
         - player: pygame midi output
@@ -31,20 +45,10 @@ class SoundOperations():
         - length: duration sound will be played
         - volume: volume of sound (max is 127)
         """
-        notes = []
-        for note_index, instrument_index in enumerate(beats):
-            if instrument_index:
-                # Get note and instrument
+        for instrument_index, other_index in enumerate(beats):
+            if other_index:  # there is a sound
+                print('Playing note: ', instrument_index)
                 instrument = self.instrument_numbers[instrument_index]
-                note = self.midi_numbers[note_index]
-                notes.append(note)
-                print('TURNING NOTE ON')
-                player.noteon(0, 60, 30)
-                player.noteon(0, 67, 30)
-                player.noteon(0, 76, 30)
-              # player.note_on(note, volume)
+                instrument.play()
 
-        sleep(length)
-        for n in notes:
-            player.note_off(n, volume)
         sleep(length)
