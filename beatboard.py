@@ -20,7 +20,6 @@ class Beatboard():
         """
         Parameters:
         - cell: image of individual cell (possibly with shape)
-        -
         Returns:
         - num_edges: number of edges if shape, else None
         """
@@ -67,6 +66,8 @@ class Beatboard():
         img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         img_blur = cv.GaussianBlur(img_gray, (3, 3), 0)
 
+        cv.imwrite('images/trial4.jpg', img_blur)
+
         # Canny Edge Detection
         # edges = cv.Canny(image=img_blur, threshold1=100,
         #                  threshold2=200)
@@ -74,6 +75,9 @@ class Beatboard():
         # Adaptive Thresholding
         thresh = cv.adaptiveThreshold(img_blur, 255,
                                       cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
+        if thresh is None:
+            raise Exception(
+                ("Could not threshold object."))
         thresh = cv.bitwise_not(thresh)
 
         # Contour Detection
@@ -105,12 +109,18 @@ class Beatboard():
 
         return (grid, gray_grid)
 
-    def set_board(self, image):
+    def set_board(self, img):
+        """
+        Parameters:
+        - img: image containing grid
+        Returns:
+        - board: 2d int array of grid (int corresponds to shape in grid, 0 if empty) 
+        """
 
         # Initialize music grid
         board = np.zeros((8, 8), dtype="int")
-        stepX = image.shape[1] // 8
-        stepY = image.shape[0] // 8
+        stepX = img.shape[1] // 8
+        stepY = img.shape[0] // 8
 
         # Loop over the grid locations
         num_shapes = 0
@@ -127,7 +137,7 @@ class Beatboard():
                 row.append((startX, startY, endX, endY))
 
                 # Crop the cell from the warped transform image and then check for shape in the cell
-                cell = image[startY:endY, startX:endX]
+                cell = img[startY:endY, startX:endX]
                 shape = self.extract_shape(cell)
                 # verify that the cell is not empty
                 if shape is not None:
@@ -136,18 +146,22 @@ class Beatboard():
         # Return board
         return board
 
-    def play_board(self, board, callback_function, bpm=60):
+    def play_board(self, board, get_new_board, bpm=60, frame=None):
         """
         Parameters:
         - board: 2d array, each row is one beat
+        - get_new_board: callback function to update board
+        - bpm: beats per minute
+        - frame: new frame to pass into callback function
         Function:
         - loops through all 8 measures and plays sounds
         """
         sound_length = 60 / bpm
         for j in range(8):
-            if j == 4:  # get new board
+            # Get new board using callback function
+            if j == 2:
                 callback_thread = threading.Thread(
-                    target=callback_function, name="Downloader")
+                    target=get_new_board, name="BoardUpdater", args=[frame])
                 callback_thread.start()
             instruments = board[j]
 

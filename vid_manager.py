@@ -1,74 +1,98 @@
 import cv2 as cv
-from frame_ops import FrameOperations
-from trombone import Trombone
 from beatboard import Beatboard
 
 
 class VideoManager():
 
     def __init__(self):
-        self.TROMBONE = Trombone()  # trombone
         self.BEATBOARD = Beatboard()  # piano
-        self.FRAME_OPS = FrameOperations()
-        self.FIRST = True
         self.board = None
 
-    def estimate_img(self):
-
-        img = cv.imread('images/trial3.jpg')
-        grid_rgb, grid_gray = self.BEATBOARD.detect_grid(img)
-        board = self.BEATBOARD.set_board(grid_gray)
-
-        self.BEATBOARD.play_board(board.T, 120)
-
-    def get_board(self):
-        # grid_rgb, grid_gray = self.BEATBOARD.detect_grid(
-        #     frame)
-        img = cv.imread('images/trial3.jpg')
+    def get_board(self, frame):
+        """
+        Parameters:
+        - frame: image of grid
+        Function:
+        - updates self.board with 2d int array of grid (int corresponds to shape in grid, 0 if empty)
+        """
+        print('GETTING BOARD')
         grid_rgb, grid_gray = self.BEATBOARD.detect_grid(
-            img)
+            frame)
         self.board = self.BEATBOARD.set_board(grid_gray)
 
-    def estimate_vid(self, webcam_id, bpm, program):
+    def estimate_img(self, image, bpm):
+        """
+        Parameters:
+        - image: image of grid
+        - bpm: beats per minute
+        Function:
+        - plays notes taken from shapes on grid
+        """
+        try:
+            while True:
+                frame = cv.imread(image)
+                # Getting first board
+                if self.board is None:
+                    print("Getting initial board.")
+                    self.get_board(frame)
+                # Playing board
+                self.BEATBOARD.play_board(
+                    (self.board).T, self.get_board, bpm, frame=frame)
+        except KeyboardInterrupt:
+            print('End Program.')
+
+    def estimate_vid(self, webcam_id, bpm, setup):
+        """
+        Parameters:
+        - webcam_id: source of live video
+        - bpm: beats per minute
+        - setup: setup mode (only shows live video and doesn't play board)
+        Function:
+        - detects grid from frame every 8 beats
+        - plays board for 8 beats
+        """
 
         cap = cv.VideoCapture(webcam_id)
         cap.set(3, 1920)
         cap.set(4, 1080)
 
-        try:
-            frame_count = 0
-            fps = 30
-            save_interval = (60 / bpm) * 8
-            print('FPS: ', fps)
-            print('Time of 1 Measure (s): ', save_interval)
-            while(True):
-                has_frame, frame = cap.read()
+        # Setup mode: only shows live feed and doesn't play board
+        if setup:
+            print('IN SETUP MODE')
+            try:
+                while True:
+                    # Show video
+                    has_frame, frame = cap.read()
+                    cv.imshow('Video Output', frame)
+                    if cv.waitKey(1) & 0xFF == ord('q'):
+                        break
+            except KeyboardInterrupt:
+                print('End Program.')
 
-                # Play music program
-                if program == "trombone":
-                    frame = self.TROMBONE.detect(frame)
-                else:
+        # Live production mode
+        else:
+            try:
+                frame_count = 0
+                fps = 30
+                save_interval = (60 / bpm) * 8
+                print('FPS: ', fps)
+                print('Time of 1 Measure (s): ', save_interval)
+
+                # Infinite Play Loop
+                while(True):
+                    has_frame, frame = cap.read()
+                    cv.imshow('Video Output', frame)
                     try:
+                        # Getting first board
                         if self.board is None:
                             print("Getting initial board.")
-                            self.get_board()
+                            self.get_board(frame)
+                        # Playing board
                         self.BEATBOARD.play_board(
-                            (self.board).T, self.get_board, bpm)
+                            (self.board).T, self.get_board, bpm, frame=frame)
                     except Exception as e:
                         print('Exception: ', e)
-                        continue
+                        break
 
-                # Show video
-                # cv.imshow('Video Output', frame)
-
-                if cv.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-        except KeyboardInterrupt:
-            print('End Program.')
-
-
-# bpm = 120
-# timetoplayboard_seconds = (60 / bpm) * 8
-
-# after 6th beat, send back signal to take snapshot, process, and update board
+            except KeyboardInterrupt:
+                print('End Program.')

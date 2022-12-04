@@ -7,15 +7,11 @@ import pygame as pg
 class SoundOperations():
 
     def __init__(self):
-        pass
-        self.notes = [
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C"]
-        self.midi_numbers = [72, 71, 69, 67, 65,
-                             64, 62, 60]  # C5 to C4 in MIDI numbers
 
         pg.init()
         pg.mixer.init()
 
+        # Load sounds
         self.hi_hat = pg.mixer.Sound('sounds/hi_hat.wav')
         self.snare = pg.mixer.Sound('sounds/snare.wav')
         self.kick = pg.mixer.Sound('sounds/kick.wav')
