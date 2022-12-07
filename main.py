@@ -16,5 +16,6 @@ class Main():
 
 if __name__ == "__main__":
     app = Main()
-    # app.live_estimation(webcam_id="http://10.30.54.36/live", setup=False)
-    app.img_estimation('images/trial3.jpg', 240)
+    # app.live_estimation(webcam_id="http://10.34.153.197/live",
+    #                     bpm = 238, setup = False)
+    app.img_estimation('images/trial5.jpg', 240)

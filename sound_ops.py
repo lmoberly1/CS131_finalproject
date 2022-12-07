@@ -33,8 +33,7 @@ class SoundOperations():
     def play_sounds(self, beats, length):
         """
         Parameters:
-        - player: pygame midi output
-        - instruments: 1D int array; int corresponds to instrument type (1, 3, 4, 5, or 6)
+        - beats: 1D int array; int corresponds to instrument type (1, 3, 4, 5, or 6)
         - length: duration sound will be played
         Function:
         - plays all notes on one beat

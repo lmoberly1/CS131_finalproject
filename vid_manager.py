@@ -18,7 +18,9 @@ class VideoManager():
         print('GETTING BOARD')
         grid_rgb, grid_gray = self.BEATBOARD.detect_grid(
             frame)
-        self.board = self.BEATBOARD.set_board(grid_gray)
+        board = self.BEATBOARD.set_board(grid_gray)
+        self.board = board
+        print(board)
 
     def estimate_img(self, image, bpm):
         """

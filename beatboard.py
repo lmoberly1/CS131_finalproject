@@ -36,23 +36,25 @@ class Beatboard():
         if len(cnts) == 0:
             return None
         else:
-            i = 0
-            for contour in cnts:
-                # Approximate the shape
-                approx = cv.approxPolyDP(
-                    contour, 0.01 * cv.arcLength(contour, True), True)
+            cv.imwrite('images/trial5_cell.jpg', thresh)
+            return 1
+            # i = 0
+            # for contour in cnts:
+            #     # Approximate the shape
+            #     approx = cv.approxPolyDP(
+            #         contour, 0.01 * cv.arcLength(contour, True), True)
 
-                # Putting shape name at center of each shape
-                if len(approx) == 3:
-                    return 3
-                elif len(approx) == 4:
-                    return 4
-                elif len(approx) == 5:
-                    return 5
-                elif len(approx) == 6:
-                    return 6
-                else:
-                    return 1
+            #     # Putting shape name at center of each shape
+            #     if len(approx) == 3:
+            #         return 3
+            #     elif len(approx) == 4:
+            #         return 4
+            #     elif len(approx) == 5:
+            #         return 5
+            #     elif len(approx) == 6:
+            #         return 6
+            #     else:
+            #         return 1
 
     def detect_grid(self, img):
         """
@@ -64,9 +66,9 @@ class Beatboard():
 
         # Grayscale and Gaussian Blur
         img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        cv.imwrite('images/trial5_gray.jpg', img_gray)
         img_blur = cv.GaussianBlur(img_gray, (3, 3), 0)
-
-        cv.imwrite('images/trial4.jpg', img_blur)
+        cv.imwrite('images/trial5_blur.jpg', img_blur)
 
         # Canny Edge Detection
         # edges = cv.Canny(image=img_blur, threshold1=100,
@@ -79,6 +81,7 @@ class Beatboard():
             raise Exception(
                 ("Could not threshold object."))
         thresh = cv.bitwise_not(thresh)
+        cv.imwrite('images/trial5_thresh.jpg', thresh)
 
         # Contour Detection
         contours, _ = cv.findContours(
@@ -106,6 +109,7 @@ class Beatboard():
             img, gridOutline.reshape(4, 2))
         gray_grid = self.FRAME_OPS.four_point_transform(
             img_gray, gridOutline.reshape(4, 2))
+        cv.imwrite('images/trial5_transform.jpg', gray_grid)
 
         return (grid, gray_grid)
 
@@ -157,13 +161,14 @@ class Beatboard():
         - loops through all 8 measures and plays sounds
         """
         sound_length = 60 / bpm
-        for j in range(8):
+        double_board = np.append(board, board, axis=0)
+        for j in range(16):
             # Get new board using callback function
             if j == 2:
                 callback_thread = threading.Thread(
                     target=get_new_board, name="BoardUpdater", args=[frame])
                 callback_thread.start()
-            instruments = board[j]
+            instruments = double_board[j]
 
             # If instrument, then play sound
             if np.count_nonzero(instruments) > 0:
